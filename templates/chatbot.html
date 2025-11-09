@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}KrishiKavach AI Chatbot - Farming Assistant{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0" style="background: var(--bg-card); border: 1px solid var(--border-color);">
+                <div class="card-header text-center py-4" style="background: linear-gradient(135deg, var(--accent-green), var(--accent-blue)); border-bottom: 1px solid var(--border-color);">
+                    <h2 class="mb-0 fw-bold text-white">
+                        <i class="fas fa-robot me-2"></i>
+                        KrishiKavach AI Assistant
+                    </h2>
+                    <p class="mb-0 mt-2 text-white-50">Your intelligent farming companion</p>
+                </div>
+                
+                <div class="card-body p-0">
+                    <!-- Language Selector -->
+                    <div class="p-3 border-bottom" style="border-color: var(--border-color);">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Language:</label>
+                                <select id="languageSelect" class="form-select" style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-primary);">
+                                    <option value="en">English</option>
+                                    <option value="hi">हिन्दी (Hindi)</option>
+                                    <option value="te">తెలుగు (Telugu)</option>
+                                    <option value="ta">தமிழ் (Tamil)</option>
+                                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                                    <option value="ml">മലയാളം (Malayalam)</option>
+                                    <option value="mr">मराठी (Marathi)</option>
+                                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                                    <option value="bn">বাংলা (Bengali)</option>
+                                    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button id="voiceInputBtn" class="btn btn-outline-primary" style="border-color: var(--accent-blue); color: var(--accent-blue);">
+                                    <i class="fas fa-microphone me-1"></i>
+                                    Voice Input
+                                </button>
+                                <button id="clearChatBtn" class="btn btn-outline-danger ms-2" style="border-color: var(--accent-orange); color: var(--accent-orange);">
+                                    <i class="fas fa-trash me-1"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="chat-messages p-3" style="height: 400px; overflow-y: auto; background: var(--bg-secondary);">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-comments fa-3x mb-3 opacity-50"></i>
+                            <p>Start a conversation with KrishiKavach AI Assistant</p>
+                            <small class="text-muted">Ask about crop recommendations, fertilizer advice, market prices, or any farming questions!</small>
+                        </div>
+                    </div>
+
+                    <!-- Quick Suggestions -->
+                    <div class="p-3 border-top" style="border-color: var(--border-color); background: var(--bg-secondary);">
+                        <p class="text-muted mb-2">Quick Questions:</p>
+                        <div id="quickSuggestions" class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-sm btn-outline-primary suggestion-btn" data-suggestion="What crops should I plant this season?">
+                                Crop Recommendation
+                            </button>
+                            <button class="btn btn-sm btn-outline-success suggestion-btn" data-suggestion="How much fertilizer should I use?">
+                                Fertilizer Advice
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning suggestion-btn" data-suggestion="What are current market prices?">
+                                Market Prices
+                            </button>
+                            <button class="btn btn-sm btn-outline-info suggestion-btn" data-suggestion="How to improve soil health?">
+                                Soil Health
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="p-3 border-top" style="border-color: var(--border-color);">
+                        <form id="chatForm" class="d-flex gap-2">
+                            <input type="text" id="messageInput" class="form-control" placeholder="Type your farming question here..." style="background: var(--bg-input); border-color: var(--border-color); color: var(--text-primary);">
+                            <button type="submit" class="btn btn-primary" style="background: var(--accent-green); border: none;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chat-message {
+    margin-bottom: 1rem;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.user-message {
+    text-align: right;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+    color: white;
+    border-radius: 18px 18px 4px 18px;
+    display: inline-block;
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
+}
+
+.bot-message .message-content {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border-radius: 18px 18px 18px 4px;
+    display: inline-block;
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+.message-time {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.typing-indicator {
+    display: inline-block;
+    padding: 0.75rem 1rem;
+    background: var(--bg-card);
+    border-radius: 18px 18px 18px 4px;
+    border: 1px solid var(--border-color);
+}
+
+.typing-indicator span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    margin: 0 2px;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.suggestion-btn {
+    transition: all 0.3s ease;
+    border-width: 2px;
+}
+
+.suggestion-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+}
+
+#voiceInputBtn.recording {
+    background: var(--accent-orange);
+    color: white;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 107, 53, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0); }
+}
+
+/* Scrollbar styling */
+.chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--accent-green);
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-blue);
+}
+</style>
+
+<script>
+class KrishiKavachChatbot {
+    constructor() {
+        this.chatMessages = document.getElementById('chatMessages');
+        this.messageInput = document.getElementById('messageInput');
+        this.chatForm = document.getElementById('chatForm');
+        this.languageSelect = document.getElementById('languageSelect');
+        this.voiceInputBtn = document.getElementById('voiceInputBtn');
+        this.clearChatBtn = document.getElementById('clearChatBtn');
+        this.quickSuggestions = document.getElementById('quickSuggestions');
+        
+        this.isRecording = false;
+        this.recognition = null;
+        
+        this.initEventListeners();
+        this.initializeSpeechRecognition();
+        this.addWelcomeMessage();
+    }
+    
+    initEventListeners() {
+        this.chatForm.addEventListener('submit', (e) => this.handleSubmit(e));
+        this.voiceInputBtn.addEventListener('click', () => this.toggleVoiceInput());
+        this.clearChatBtn.addEventListener('click', () => this.clearChat());
+        
+        // Quick suggestions
+        this.quickSuggestions.addEventListener('click', (e) => {
+            if (e.target.classList.contains('suggestion-btn')) {
+                const suggestion = e.target.getAttribute('data-suggestion');
+                this.sendMessage(suggestion);
+            }
+        });
+        
+        // Enter key to send message
+        this.messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                this.handleSubmit(e);
+            }
+        });
+    }
+    
+    initializeSpeechRecognition() {
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            this.recognition = new SpeechRecognition();
+            
+            this.recognition.continuous = false;
+            this.recognition.interimResults = false;
+            this.recognition.lang = 'en-US';
+            
+            this.recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                this.messageInput.value = transcript;
+                this.sendMessage(transcript);
+            };
+            
+            this.recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                this.isRecording = false;
+                this.updateVoiceButton();
+            };
+            
+            this.recognition.onend = () => {
+                this.isRecording = false;
+                this.updateVoiceButton();
+            };
+        }
+    }
+    
+    toggleVoiceInput() {
+        if (!this.recognition) {
+            alert('Voice input is not supported in your browser. Please use Chrome or Edge.');
+            return;
+        }
+        
+        if (this.isRecording) {
+            this.recognition.stop();
+        } else {
+            // Set language based on selection
+            const langMap = {
+                'en': 'en-US',
+                'hi': 'hi-IN',
+                'te': 'te-IN',
+                'ta': 'ta-IN',
+                'kn': 'kn-IN',
+                'ml': 'ml-IN',
+                'mr': 'mr-IN',
+                'gu': 'gu-IN',
+                'bn': 'bn-IN',
+                'pa': 'pa-IN'
+            };
+            
+            this.recognition.lang = langMap[this.languageSelect.value] || 'en-US';
+            this.recognition.start();
+            this.isRecording = true;
+            this.updateVoiceButton();
+        }
+    }
+    
+    updateVoiceButton() {
+        if (this.isRecording) {
+            this.voiceInputBtn.innerHTML = '<i class="fas fa-stop me-1"></i> Stop Recording';
+            this.voiceInputBtn.classList.add('recording');
+        } else {
+            this.voiceInputBtn.innerHTML = '<i class="fas fa-microphone me-1"></i> Voice Input';
+            this.voiceInputBtn.classList.remove('recording');
+        }
+    }
+    
+    handleSubmit(e) {
+        e.preventDefault();
+        const message = this.messageInput.value.trim();
+        if (message) {
+            this.sendMessage(message);
+        }
+    }
+    
+    sendMessage(message) {
+        this.addMessage(message, 'user');
+        this.messageInput.value = '';
+        this.showTypingIndicator();
+        
+        // Send to API
+        fetch('/chatbot/api', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                language: this.languageSelect.value
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.hideTypingIndicator();
+            this.addMessage(data.response, 'bot', data.suggestions);
+            
+            // Update quick suggestions if available
+            if (data.suggestions && data.suggestions.length > 0) {
+                this.updateQuickSuggestions(data.suggestions);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            this.hideTypingIndicator();
+            this.addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+        });
+    }
+    
+    addMessage(content, sender, suggestions = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${sender}-message`;
+        
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        let messageContent = `
+            <div class="message-content">
+                ${this.formatMessage(content)}
+            </div>
+            <div class="message-time">${time}</div>
+        `;
+        
+        if (suggestions && suggestions.length > 0) {
+            messageContent += `
+                <div class="mt-2">
+                    <small class="text-muted">Suggestions:</small>
+                    <div class="d-flex flex-wrap gap-1 mt-1">
+                        ${suggestions.map(s => `<button class="btn btn-sm btn-outline-light suggestion-btn" data-suggestion="${s}">${s}</button>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        messageDiv.innerHTML = messageContent;
+        this.chatMessages.appendChild(messageDiv);
+        this.scrollToBottom();
+    }
+    
+    addWelcomeMessage() {
+        const welcomeMessage = `
+            <div class="text-center mb-3">
+                <i class="fas fa-robot fa-2x text-primary mb-2"></i>
+                <h5 class="text-primary">Hello! I'm KrishiKavach AI Assistant</h5>
+                <p class="text-muted">I'm here to help you with:</p>
+                <div class="row text-center">
+                    <div class="col-6 col-md-3 mb-2">
+                        <i class="fas fa-seedling text-success"></i>
+                        <small class="d-block">Crop Recommendations</small>
+                    </div>
+                    <div class="col-6 col-md-3 mb-2">
+                        <i class="fas fa-flask text-warning"></i>
+                        <small class="d-block">Fertilizer Advice</small>
+                    </div>
+                    <div class="col-6 col-md-3 mb-2">
+                        <i class="fas fa-chart-line text-info"></i>
+                        <small class="d-block">Market Prices</small>
+                    </div>
+                    <div class="col-6 col-md-3 mb-2">
+                        <i class="fas fa-calculator text-purple"></i>
+                        <small class="d-block">Production Estimation</small>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const welcomeDiv = document.createElement('div');
+        welcomeDiv.className = 'chat-message bot-message';
+        welcomeDiv.innerHTML = `<div class="message-content">${welcomeMessage}</div>`;
+        this.chatMessages.appendChild(welcomeDiv);
+        this.scrollToBottom();
+    }
+    
+    formatMessage(content) {
+        // Simple markdown-like formatting
+        return content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
+    }
+    
+    showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message bot-message typing-indicator';
+        typingDiv.id = 'typingIndicator';
+        typingDiv.innerHTML = `
+            <span></span>
+            <span></span>
+            <span></span>
+        `;
+        this.chatMessages.appendChild(typingDiv);
+        this.scrollToBottom();
+    }
+    
+    hideTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+    }
+    
+    updateQuickSuggestions(suggestions) {
+        const quickSuggestionsHTML = suggestions.map(suggestion => 
+            `<button class="btn btn-sm btn-outline-primary suggestion-btn" data-suggestion="${suggestion}">${suggestion}</button>`
+        ).join('');
+        
+        this.quickSuggestions.innerHTML = `
+            <p class="text-muted mb-2">Quick Questions:</p>
+            <div class="d-flex flex-wrap gap-2">
+                ${quickSuggestionsHTML}
+            </div>
+        `;
+    }
+    
+    clearChat() {
+        if (confirm('Are you sure you want to clear the conversation?')) {
+            this.chatMessages.innerHTML = '';
+            this.addWelcomeMessage();
+        }
+    }
+    
+    scrollToBottom() {
+        this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+    }
+}
+
+// Initialize chatbot when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    new KrishiKavachChatbot();
+});
+</script>
+{% endblock %}

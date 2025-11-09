@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Price Analysis - Farmer's Assistant{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-chart-line text-success"></i> Price Risk Analysis Tool
+        </h2>
+        <p class="text-center text-muted mb-5">
+            Analyze market prices and storage risks to make informed selling decisions
+        </p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-calculator"></i> Enter Your Commodity Details
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="priceForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="current_price" class="form-label">
+                                <i class="fas fa-rupee-sign"></i> Current Market Price
+                            </label>
+                            <input type="number" class="form-control" id="current_price" name="current_price" 
+                                   placeholder="Enter current price per quintal" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="quantity_qtl" class="form-label">
+                                <i class="fas fa-weight"></i> Quantity (Quintals)
+                            </label>
+                            <input type="number" class="form-control" id="quantity_qtl" name="quantity_qtl" 
+                                   placeholder="Enter quantity in quintals" step="0.1" min="0.1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="storage_cost_per_day" class="form-label">
+                                <i class="fas fa-warehouse"></i> Storage Cost per Day
+                            </label>
+                            <input type="number" class="form-control" id="storage_cost_per_day" name="storage_cost_per_day" 
+                                   placeholder="Enter daily storage cost" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="daily_loss_percent" class="form-label">
+                                <i class="fas fa-chart-line-down"></i> Daily Loss Percentage
+                            </label>
+                            <input type="number" class="form-control" id="daily_loss_percent" name="daily_loss_percent" 
+                                   placeholder="Enter daily loss percentage" step="0.01" min="0" max="100" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="interest_rate_monthly" class="form-label">
+                                <i class="fas fa-percentage"></i> Monthly Interest Rate (%)
+                            </label>
+                            <input type="number" class="form-control" id="interest_rate_monthly" name="interest_rate_monthly" 
+                                   placeholder="Enter monthly interest rate" step="0.01" min="0" max="100" required>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-chart-bar"></i> Analyze Price Risk
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4" id="results" style="display: none;">
+    <div class="col-12">
+        <div class="card result-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar"></i> Price Analysis Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6 class="text-success">Predicted Price (15 days):</h6>
+                        <h3 id="predictedPrice" class="text-success fw-bold"></h3>
+                        <p class="text-muted">per quintal</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Price Change:</h6>
+                        <h3 id="priceChange" class="fw-bold"></h3>
+                        <p class="text-muted">percentage</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Risk Assessment:</h6>
+                        <h3 id="riskLevel" class="fw-bold"></h3>
+                        <p class="text-muted">risk level</p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Recommendation:</h6>
+                    <p id="recommendation" class="mb-0"></p>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6 class="text-success">If You Sell Now:</h6>
+                                <h4 id="sellNowAmount" class="text-success fw-bold"></h4>
+                                <p class="text-muted">Total amount</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6 class="text-primary">If You Store for 15 Days:</h6>
+                                <h4 id="storeAmount" class="text-primary fw-bold"></h4>
+                                <p class="text-muted">Estimated amount</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('priceForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        showLoading();
+        
+        const formData = {
+            current_price: document.getElementById('current_price').value,
+            quantity: document.getElementById('quantity_qtl').value,
+            storage_cost: document.getElementById('storage_cost_per_day').value,
+            daily_loss: document.getElementById('daily_loss_percent').value,
+            interest_rate: document.getElementById('interest_rate_monthly').value
+        };
+        
+        try {
+            const response = await fetch('/predict_price', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                showAlert(result.error, 'danger');
+            } else {
+                // Display results
+                document.getElementById('predictedPrice').textContent = '₹' + result.predicted_price_15d;
+                
+                // Calculate price change percentage
+                const currentPrice = parseFloat(formData.current_price);
+                const priceChange = ((result.predicted_price_15d - currentPrice) / currentPrice) * 100;
+                document.getElementById('priceChange').textContent = priceChange.toFixed(1) + '%';
+                document.getElementById('priceChange').className = priceChange >= 0 ? 'fw-bold text-success' : 'fw-bold text-danger';
+                
+                document.getElementById('riskLevel').textContent = result.risk_level;
+                document.getElementById('recommendation').textContent = result.recommendation;
+                
+                // Use the calculated amounts from the API
+                document.getElementById('sellNowAmount').textContent = '₹' + result.current_value.toFixed(2);
+                document.getElementById('storeAmount').textContent = '₹' + result.future_value_15d.toFixed(2);
+                
+                document.getElementById('results').style.display = 'block';
+                showAlert('Price analysis completed successfully!', 'success');
+            }
+        } catch (error) {
+            showAlert('Error analyzing price. Please try again.', 'danger');
+        }
+        
+        hideLoading();
+    });
+</script>
+{% endblock %}

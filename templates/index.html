@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <h1>KrishiKavach</h1>
+    <p>AI-Powered Farming for a Sustainable Future</p>
+    <p class="mt-4">Harness the power of AI to make smarter farming decisions. Get personalized crop recommendations, optimize fertilizer usage, analyze market prices, and estimate your production with unparalleled accuracy.</p>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3"><i class="fas fa-leaf fa-3x"></i></div>
+                    <h5 class="card-title">Crop Recommendation</h5>
+                    <p class="card-text">Get tailored crop suggestions based on your soil and climate.</p>
+                    <a href="/crop-recommendation" class="btn btn-primary mt-auto">Get Started</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3"><i class="fas fa-flask fa-3x"></i></div>
+                    <h5 class="card-title">Fertilizer Guide</h5>
+                    <p class="card-text">Optimize fertilizer usage with AI-powered recommendations.</p>
+                    <a href="/fertilizer-recommendation" class="btn btn-primary mt-auto">Get Started</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3"><i class="fas fa-chart-line fa-3x"></i></div>
+                    <h5 class="card-title">Price Analysis</h5>
+                    <p class="card-text">Analyze market prices and risks to maximize profits.</p>
+                    <a href="/price-analysis" class="btn btn-primary mt-auto">Get Started</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="card h-100 text-center">
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3"><i class="fas fa-tractor fa-3x"></i></div>
+                    <h5 class="card-title">Production Estimator</h5>
+                    <p class="card-text">Estimate crop production based on your field conditions.</p>
+                    <a href="/production-estimation" class="btn btn-primary mt-auto">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Coming Soon Features -->
+    <div class="row mt-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="card coming-soon-card h-100 text-center">
+                <div class="coming-soon-badge">Coming Soon</div>
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3"><i class="fas fa-virus fa-3x"></i></div>
+                    <h5 class="card-title">Disease Predictor</h5>
+                    <p class="card-text">AI-powered plant disease detection and treatment recommendations.</p>
+                    <button class="btn btn-secondary mt-auto" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6">
+            <div class="card coming-soon-card h-100 text-center">
+                <div class="coming-soon-badge">Coming Soon</div>
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-3"><i class="fas fa-users fa-3x"></i></div>
+                    <h5 class="card-title">Community</h5>
+                    <p class="card-text">Connect with fellow farmers and share knowledge and experiences.</p>
+                    <button class="btn btn-secondary mt-auto" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="mb-4">Why Choose KrishiKavach?</h2>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="fas fa-brain fa-3x mb-3"></i>
+                                <h5>Data-Driven Insights</h5>
+                                <p>Our advanced machine learning models provide accurate, real-time predictions to guide your farming strategy.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="fas fa-mobile-alt fa-3x mb-3"></i>
+                                <h5>Accessible Anywhere</h5>
+                                <p>Our platform is designed to be intuitive and easy to use on any device, whether you're in the field or at home.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3">
+                                <i class="fas fa-dollar-sign fa-3x mb-3"></i>
+                                <h5>Increased Profitability</h5>
+                                <p>Make informed decisions that reduce risk, optimize resource use, and ultimately boost your farm's profitability.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

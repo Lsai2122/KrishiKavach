@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Production Estimation - Farmer's Assistant{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4">
+            <i class="fas fa-calculator text-success"></i> Production Estimation Tool
+        </h2>
+        <p class="text-center text-muted mb-5">
+            Estimate your crop production based on field conditions and inputs
+        </p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-seedling"></i> Enter Your Field Parameters
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="productionForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="area_ha" class="form-label">
+                                <i class="fas fa-map"></i> Field Area (Hectares)
+                            </label>
+                            <input type="number" class="form-control" id="area_ha" name="area_ha" 
+                                   placeholder="Enter field area" step="0.1" min="0.1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="n_req_kg_per_ha" class="form-label">
+                                <i class="fas fa-atom"></i> Nitrogen Requirement (kg/ha)
+                            </label>
+                            <input type="number" class="form-control" id="n_req_kg_per_ha" name="n_req_kg_per_ha" 
+                                   placeholder="Enter nitrogen requirement" step="0.1" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="p_req_kg_per_ha" class="form-label">
+                                <i class="fas fa-atom"></i> Phosphorus Requirement (kg/ha)
+                            </label>
+                            <input type="number" class="form-control" id="p_req_kg_per_ha" name="p_req_kg_per_ha" 
+                                   placeholder="Enter phosphorus requirement" step="0.1" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="k_req_kg_per_ha" class="form-label">
+                                <i class="fas fa-atom"></i> Potassium Requirement (kg/ha)
+                            </label>
+                            <input type="number" class="form-control" id="k_req_kg_per_ha" name="k_req_kg_per_ha" 
+                                   placeholder="Enter potassium requirement" step="0.1" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="temperature_c" class="form-label">
+                                <i class="fas fa-thermometer-half"></i> Temperature (°C)
+                            </label>
+                            <input type="number" class="form-control" id="temperature_c" name="temperature_c" 
+                                   placeholder="Enter average temperature" step="0.1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="humidity_percent" class="form-label">
+                                <i class="fas fa-tint"></i> Humidity (%)
+                            </label>
+                            <input type="number" class="form-control" id="humidity_percent" name="humidity_percent" 
+                                   placeholder="Enter humidity percentage" step="0.1" min="0" max="100" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ph" class="form-label">
+                                <i class="fas fa-vial"></i> pH Level
+                            </label>
+                            <input type="number" class="form-control" id="ph" name="ph" 
+                                   placeholder="Enter pH level (0-14)" step="0.1" min="0" max="14" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="rainfall_mm" class="form-label">
+                                <i class="fas fa-cloud-rain"></i> Rainfall (mm)
+                            </label>
+                            <input type="number" class="form-control" id="rainfall_mm" name="rainfall_mm" 
+                                   placeholder="Enter rainfall amount" step="0.1" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="wind_speed_m_s" class="form-label">
+                                <i class="fas fa-wind"></i> Wind Speed (m/s)
+                            </label>
+                            <input type="number" class="form-control" id="wind_speed_m_s" name="wind_speed_m_s" 
+                                   placeholder="Enter wind speed" step="0.1" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="solar_radiation_mj_m2_day" class="form-label">
+                                <i class="fas fa-sun"></i> Solar Radiation (MJ/m²/day)
+                            </label>
+                            <input type="number" class="form-control" id="solar_radiation_mj_m2_day" name="solar_radiation_mj_m2_day" 
+                                   placeholder="Enter solar radiation" step="0.1" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-chart-bar"></i> Estimate Production
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4" id="results" style="display: none;">
+    <div class="col-12">
+        <div class="card result-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar"></i> Production Estimation Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-success">Predicted Yield per Hectare:</h6>
+                        <h3 id="yieldPerHectare" class="text-success fw-bold"></h3>
+                        <p class="text-muted">kg per hectare</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Total Predicted Production:</h6>
+                        <h3 id="totalProduction" class="text-primary fw-bold"></h3>
+                        <p class="text-muted">kg total</p>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <h6><i class="fas fa-lightbulb"></i> Optimization Tips:</h6>
+                    <ul class="mb-0">
+                        <li>Consider adjusting fertilizer ratios based on soil test results</li>
+                        <li>Monitor weather conditions for optimal planting timing</li>
+                        <li>Implement proper irrigation scheduling</li>
+                        <li>Regular field monitoring for pest and disease management</li>
+                    </ul>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6 class="text-success">Good Conditions</h6>
+                                <p class="text-muted">Yield may increase by 10-15%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6 class="text-warning">Average Conditions</h6>
+                                <p class="text-muted">Yield as predicted</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h6 class="text-danger">Poor Conditions</h6>
+                                <p class="text-muted">Yield may decrease by 10-20%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('productionForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        showLoading();
+        
+        const formData = {
+            area: document.getElementById('area_ha').value,
+            nitrogen_req: document.getElementById('n_req_kg_per_ha').value,
+            phosphorus_req: document.getElementById('p_req_kg_per_ha').value,
+            potassium_req: document.getElementById('k_req_kg_per_ha').value,
+            temperature: document.getElementById('temperature_c').value,
+            humidity: document.getElementById('humidity_percent').value,
+            ph: document.getElementById('ph').value,
+            rainfall: document.getElementById('rainfall_mm').value,
+            wind_speed: document.getElementById('wind_speed_m_s').value,
+            solar_radiation: document.getElementById('solar_radiation_mj_m2_day').value
+        };
+        
+        try {
+            const response = await fetch('/predict_production', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.error) {
+                showAlert(result.error, 'danger');
+            } else {
+                // Display results
+                document.getElementById('yieldPerHectare').textContent = result.yield_per_hectare.toLocaleString();
+                document.getElementById('totalProduction').textContent = result.total_production.toLocaleString();
+                
+                document.getElementById('results').style.display = 'block';
+                showAlert('Production estimation completed successfully!', 'success');
+            }
+        } catch (error) {
+            showAlert('Error estimating production. Please try again.', 'danger');
+        }
+        
+        hideLoading();
+    });
+</script>
+{% endblock %}
